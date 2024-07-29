@@ -19,6 +19,6 @@ public class UserController {
 return new GenericMessage("user is creatted");
 
     }
-
+//ss
 
 }

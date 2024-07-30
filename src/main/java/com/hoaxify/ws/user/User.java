@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 //spirng data jpa bu callsın data basede tablo karşılı olduğunu karşılayacak yoksada orda yaratacak bu default davranıştır
@@ -12,8 +13,12 @@ public class User {
     @Id
     @GeneratedValue//veri tabanında kendi artma yapmasına yaradı
     long id;
+
+    @NotBlank//boş olamaması için bunu ekliyoruz
     String username;
+
     String password;
+    @NotBlank
     String email;
 
     public long getId() {

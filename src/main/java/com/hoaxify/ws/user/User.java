@@ -15,12 +15,12 @@ public class User {
     @GeneratedValue//veri tabanında kendi artma yapmasına yaradı
     long id;
 
-    @NotBlank//boş olamaması için bunu ekliyoruz
-    @Size(min = 4, max = 255)
+    @NotBlank(message = "{hoaxify.constraint.username.notblank}")//boş olamaması için bunu ekliyoruz
+   @Size(min = 4, max = 255)
     String username;
 
     @Size(min = 8, max = 255)
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$",message = "{hoaxify.constraint.password.pattern}")
     String password;
 
 

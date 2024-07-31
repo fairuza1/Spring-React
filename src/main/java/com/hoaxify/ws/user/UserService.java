@@ -1,5 +1,6 @@
 package com.hoaxify.ws.user;
 
+import com.hoaxify.ws.user.exception.NotUniqEmailException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

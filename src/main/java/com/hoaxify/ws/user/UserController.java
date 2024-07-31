@@ -3,16 +3,17 @@ package com.hoaxify.ws.user;
 
 import com.hoaxify.ws.error.ApiError;
 import com.hoaxify.ws.shared.GenericMessage;
+import com.hoaxify.ws.shared.Messages;
+import com.hoaxify.ws.user.exception.NotUniqEmailException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -23,16 +24,20 @@ public class UserController {
     //  @CrossOrigin //bunuda bakalıcak ve gerek kalmadı buna çünkü frontend kısımında proxy ayarı yapıldı
     @PostMapping("/api/v1/users")
     GenericMessage createUser(@Valid @RequestBody User user) {
+
         userService.save(user);//requeste gelen jason bizim bizim user objeye mapleniyor
-        return new GenericMessage("kullanıcı oluşturuldu");
+        String message = Messages.getMessageForLocale("hoaxify.create.user.success.message", LocaleContextHolder.getLocale());
+        return new GenericMessage(message);
     }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ResponseEntity<ApiError> handleMethodArgtNotValidEx(MethodArgumentNotValidException exception) {
         ApiError apiError = new ApiError();
         apiError.setPath("/api/v1/users");
-        apiError.setMessage("Validation error");
+        String message = Messages.getMessageForLocale("hoaxify.error.validation", LocaleContextHolder.getLocale());
+        apiError.setMessage(message);
         apiError.setStatus(400);
-        var validationErrors = exception.getBindingResult().getFieldErrors().stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage,(existing,replacing)->existing));
+        var validationErrors = exception.getBindingResult().getFieldErrors().stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage, (existing, replacing) -> existing));
         apiError.setValidationErrors(validationErrors);
         return ResponseEntity.badRequest().body(apiError);
     }
@@ -41,11 +46,9 @@ public class UserController {
     ResponseEntity<ApiError> handleNotUniqEmailEx(NotUniqEmailException exception) {
         ApiError apiError = new ApiError();
         apiError.setPath("/api/v1/users");
-        apiError.setMessage("Validation error");
+        apiError.setMessage(exception.getMessage());
         apiError.setStatus(400);
-        Map<String,String>validationErrors = new HashMap<>();
-        validationErrors.put("email","E-mail kullanınız");
-        apiError.setValidationErrors(validationErrors);
+        apiError.setValidationErrors(exception.getValidationErrors());
         return ResponseEntity.badRequest().body(apiError);
     }
 

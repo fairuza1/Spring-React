@@ -1,33 +1,46 @@
 package com.hoaxify.ws.user;
 
-import com.hoaxify.ws.user.validation.UniqueEmail;
+
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+
 
 @Entity
 //spirng data jpa bu callsın data basede tablo karşılı olduğunu karşılayacak yoksada orda yaratacak bu default davranıştır
-@Table(name = "users",uniqueConstraints =@UniqueConstraint(columnNames = {"email"})  )
+@Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = {"email"}))
 public class User {
     @Id
     @GeneratedValue//veri tabanında kendi artma yapmasına yaradı
     long id;
 
-    @NotBlank(message = "{hoaxify.constraint.username.notblank}")//boş olamaması için bunu ekliyoruz
-   @Size(min = 4, max = 255)
+
     String username;
 
-    @Size(min = 8, max = 255)
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$",message = "{hoaxify.constraint.password.pattern}")
     String password;
 
-
-    @NotBlank
-    @Email
-    @UniqueEmail
     String email;
+
+    boolean active = false;
+
+    String activationToken;
+
+
+    public String getActivationToken() {
+        return activationToken;
+    }
+
+    public void setActivationToken(String activationToken) {
+        this.activationToken = activationToken;
+    }
+
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
 
     public long getId() {
         return id;

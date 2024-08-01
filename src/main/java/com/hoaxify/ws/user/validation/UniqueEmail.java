@@ -8,17 +8,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Constraint(
-        validatedBy = {UniqueEmailValidator.class}
-)
+@Constraint(validatedBy = UniqueEmailValidator.class)
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-
 public @interface UniqueEmail {
+
     String message() default "{hoaxify.constraint.email.notunique}";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
-
 }

@@ -1,9 +1,13 @@
 package com.hoaxify.ws.error;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+@JsonInclude(value = JsonInclude.Include.NON_NULL)
+//spring bu api erro objhesni jsaon çevieiken null olamyan fieldleri ekle
 public class ApiError {//hata mesajları için oluşturaln response objesi
 
     private int status;
@@ -14,7 +18,7 @@ public class ApiError {//hata mesajları için oluşturaln response objesi
 
     private long timestamp = new Date().getTime();
 
-    private Map<String, String> validationErrors = new HashMap<>()  ;//validation errorların gösterileceği barındırtacak bir map eklenecek böylece cliente hangi fieldların hangi nedenlerle red edildiği sunulcak
+    private Map<String, String> validationErrors = null;//validation errorların gösterileceği barındırtacak bir map eklenecek böylece cliente hangi fieldların hangi nedenlerle red edildiği sunulcak
 
 
     public String getMessage() {

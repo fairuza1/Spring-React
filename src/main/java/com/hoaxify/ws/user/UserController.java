@@ -4,6 +4,8 @@ package com.hoaxify.ws.user;
 import com.hoaxify.ws.error.ApiError;
 import com.hoaxify.ws.shared.GenericMessage;
 import com.hoaxify.ws.shared.Messages;
+import com.hoaxify.ws.user.dto.UserCreate;
+import com.hoaxify.ws.user.exception.ActivationNotificationException;
 import com.hoaxify.ws.user.exception.NotUniqEmailException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,15 +25,16 @@ public class UserController {
 
     //  @CrossOrigin //bunuda bakalıcak ve gerek kalmadı buna çünkü frontend kısımında proxy ayarı yapıldı
     @PostMapping("/api/v1/users")
-    GenericMessage createUser(@Valid @RequestBody User user) {
+    GenericMessage createUser(@Valid @RequestBody UserCreate user) { // usercreate olmayan fieldlar tehlke olmuyo çünkü sadece var olan usercreate fieldları usere mapliyoruz
 
-        userService.save(user);//requeste gelen jason bizim bizim user objeye mapleniyor
+        userService.save(user.toUser());
+        //burada ise user.touser methodu sayesinde inakfif oldu
         String message = Messages.getMessageForLocale("hoaxify.create.user.success.message", LocaleContextHolder.getLocale());
         return new GenericMessage(message);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    ResponseEntity<ApiError> handleMethodArgtNotValidEx(MethodArgumentNotValidException exception) {
+    ResponseEntity<ApiError> handleMethodArgNotValidEx(MethodArgumentNotValidException exception){
         ApiError apiError = new ApiError();
         apiError.setPath("/api/v1/users");
         String message = Messages.getMessageForLocale("hoaxify.error.validation", LocaleContextHolder.getLocale());
@@ -41,39 +44,25 @@ public class UserController {
         apiError.setValidationErrors(validationErrors);
         return ResponseEntity.badRequest().body(apiError);
     }
-
     @ExceptionHandler(NotUniqEmailException.class)
-    ResponseEntity<ApiError> handleNotUniqEmailEx(NotUniqEmailException exception) {
+    ResponseEntity<ApiError> handleNotUniqueEmailEx(NotUniqEmailException exception){
         ApiError apiError = new ApiError();
         apiError.setPath("/api/v1/users");
         apiError.setMessage(exception.getMessage());
         apiError.setStatus(400);
         apiError.setValidationErrors(exception.getValidationErrors());
-        return ResponseEntity.badRequest().body(apiError);
+        return ResponseEntity.status(400).body(apiError);
+    }
+    @ExceptionHandler(ActivationNotificationException.class)
+    ResponseEntity<ApiError> handleActivationNotificationException(ActivationNotificationException exception){
+        ApiError apiError = new ApiError();
+        apiError.setPath("/api/v1/users");
+        apiError.setMessage(exception.getMessage());
+        apiError.setStatus(502);
+        return ResponseEntity.status(502).body(apiError);
     }
 
+
+
+// 400 hata mesajları http client hatasını ifade eder 500 ise server hatasını ifade eder
 }
-//        ApiError apiError = new ApiError();
-//        apiError.setPath("/api/v1/users");
-//        apiError.setMessage("Validation error");
-//        apiError.setStatus(400);
-//        Map<String, String> validationErrors = new HashMap<>();
-//        if (user.getUsername() == null || user.getUsername().isEmpty()) {
-////burada ise hatalı giriş yaptığında ismi null girdiğinde ve boşş girdiğinde status400 hatası karşılayacak
-//            validationErrors.put("username", "username cannot be null!!");
-//        }
-//        if (user.getEmail() == null || user.getEmail().isEmpty()) {
-//            validationErrors.put("email", "email alanı boş olamaz!!! ");
-//        }
-//        if (validationErrors.size() > 0) {
-//
-//            apiError.setValidationErrors(validationErrors);
-//            return ResponseEntity.badRequest().body(apiError);
-//        }
-
-
-//        Map<String, String> validationErrors = new HashMap<>();
-//        for (var fieldError : exception.getBindingResult().getFieldErrors()) {
-//            validationErrors.put(fieldError.getField(), fieldError.getDefaultMessage());
-//
-//        }

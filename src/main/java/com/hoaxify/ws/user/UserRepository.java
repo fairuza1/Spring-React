@@ -9,5 +9,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findByEmail(String email);// bize bir query oluşturacak  bunun sayesinde username mail password bunları kullanabileceğiz
 
-
+    User findByActivationToken(String token);
 }

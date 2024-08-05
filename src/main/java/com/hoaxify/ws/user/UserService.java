@@ -7,11 +7,14 @@ import com.hoaxify.ws.user.exception.InvalidTokenException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.mail.MailException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -48,12 +51,16 @@ public class UserService {
     public void activateUser(String token) {
         User inDB = userRepository.findByActivationToken(token);//burada user databaseden bulmaya çalışacağız eğer böyle bir user yoksa hata mesajı dönmek gerekiyor
         if (inDB == null) {
-    //burdakş hatayı tetikleyen şey şu olabilir bu token artık geçerlilik hükmü kalmamış ise buraya girerek hata verdirece
-       throw new InvalidTokenException();
+            //burdakş hatayı tetikleyen şey şu olabilir bu token artık geçerlilik hükmü kalmamış ise buraya girerek hata verdirece
+            throw new InvalidTokenException();
 
         }//user varsa active true olacak ve bu tokenla işlemyapıldığı için bu token null olur ve database kayıt olacaktır
         inDB.setActive(true);
         inDB.setActivationToken(null);
         userRepository.save(inDB);
+    }
+
+    public Page<User> getUsers(Pageable page) {
+        return userRepository.findAll(page);
     }
 }

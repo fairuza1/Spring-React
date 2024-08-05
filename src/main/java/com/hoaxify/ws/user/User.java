@@ -1,6 +1,7 @@
 package com.hoaxify.ws.user;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 
@@ -14,14 +15,24 @@ public class User {
 
 
     String username;
-
+@JsonIgnore//görünmesini istemediklerimize bunu koyarız
     String password;
 
     String email;
-
+    @JsonIgnore
     boolean active = false;
-
+    @JsonIgnore
     String activationToken;
+
+    String image;
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
 
 
     public String getActivationToken() {

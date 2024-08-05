@@ -11,12 +11,15 @@ import com.hoaxify.ws.user.exception.NotUniqEmailException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -33,7 +36,9 @@ public class UserController {
         String message = Messages.getMessageForLocale("hoaxify.create.user.success.message", LocaleContextHolder.getLocale());
         return new GenericMessage(message);
     }
-    @PatchMapping("/api/v1/users/{token}/active")//entitynin sadece belli bir kısmını değişttirmek için nu kullanılır burada da userda ki activation falsedan trueya çekeceğim
+
+    @PatchMapping("/api/v1/users/{token}/active")
+//entitynin sadece belli bir kısmını değişttirmek için nu kullanılır burada da userda ki activation falsedan trueya çekeceğim
 //cliente gönderilen bir token var onu ıdentiy olarak kullanacağız zaten bu token uniqe olacağı için kulalnıcı ile ilişkisi var
 
     GenericMessage activateUser(@PathVariable String token) { //token e erişmek için pathvariable anatasyonu ile erişebiliriz
@@ -41,8 +46,16 @@ public class UserController {
         String message = Messages.getMessageForLocale("hoaxify.activate.user.success.message", LocaleContextHolder.getLocale());
         return new GenericMessage(message);
     }
+
+    //birden fazla kullancıı oldugğu için listelmek için bir and point eklendi bunun içinde http methodu ise get methodu
+    @GetMapping("/api/v1/users")
+    Page<User> getUsers(Pageable pageable) {//bu controllerden elimizle kaç tane veri girmek yerine bu request  bzie belirli bir miktar sayi girmemizi sağlar
+        return userService.getUsers(pageable);
+    }
+
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    ResponseEntity<ApiError> handleMethodArgNotValidEx(MethodArgumentNotValidException exception){
+    ResponseEntity<ApiError> handleMethodArgNotValidEx(MethodArgumentNotValidException exception) {
         ApiError apiError = new ApiError();
         apiError.setPath("/api/v1/users");
         String message = Messages.getMessageForLocale("hoaxify.error.validation", LocaleContextHolder.getLocale());
@@ -52,8 +65,9 @@ public class UserController {
         apiError.setValidationErrors(validationErrors);
         return ResponseEntity.badRequest().body(apiError);
     }
+
     @ExceptionHandler(NotUniqEmailException.class)
-    ResponseEntity<ApiError> handleNotUniqueEmailEx(NotUniqEmailException exception){
+    ResponseEntity<ApiError> handleNotUniqueEmailEx(NotUniqEmailException exception) {
         ApiError apiError = new ApiError();
         apiError.setPath("/api/v1/users");
         apiError.setMessage(exception.getMessage());
@@ -61,8 +75,9 @@ public class UserController {
         apiError.setValidationErrors(exception.getValidationErrors());
         return ResponseEntity.status(400).body(apiError);
     }
+
     @ExceptionHandler(ActivationNotificationException.class)
-    ResponseEntity<ApiError> handleActivationNotificationException(ActivationNotificationException exception){
+    ResponseEntity<ApiError> handleActivationNotificationException(ActivationNotificationException exception) {
         ApiError apiError = new ApiError();
         apiError.setPath("/api/v1/users");
         apiError.setMessage(exception.getMessage());
@@ -71,16 +86,13 @@ public class UserController {
     }
 
     @ExceptionHandler(InvalidTokenException.class)
-    ResponseEntity<ApiError> handleInvalidTokenException(InvalidTokenException exception){
+    ResponseEntity<ApiError> handleInvalidTokenException(InvalidTokenException exception) {
         ApiError apiError = new ApiError();
         apiError.setPath("/api/v1/users");
         apiError.setMessage(exception.getMessage());
         apiError.setStatus(400);
         return ResponseEntity.status(400).body(apiError);
     }
-
-
-
 
 
 // 400 hata mesajları http client hatasını ifade eder 500 ise server hatasını ifade eder

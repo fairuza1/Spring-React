@@ -1,7 +1,9 @@
 package com.hoaxify.ws.user;
 
 import com.hoaxify.ws.email.EmailService;
+import com.hoaxify.ws.user.dto.UserDto;
 import com.hoaxify.ws.user.exception.ActivationNotificationException;
+import com.hoaxify.ws.user.exception.NotFoundException;
 import com.hoaxify.ws.user.exception.NotUniqEmailException;
 import com.hoaxify.ws.user.exception.InvalidTokenException;
 import jakarta.transaction.Transactional;
@@ -61,5 +63,9 @@ public class UserService {
 
     public Page<User> getUsers(Pageable page) {
         return userRepository.findAll(page);
+    }
+
+    public User getUser(long id) {
+        return  userRepository.findById(id).orElseThrow(()-> new NotFoundException(id));// bu method geriye varsa user objesi döndürecek yoksa bu exceptionu atacak bu da kendi içinde id kullanarak mesajı translate etmiş olacak ve en sonundada not foun user conttroller ile
     }
 }

@@ -5,10 +5,15 @@ import com.hoaxify.ws.error.ApiError;
 import com.hoaxify.ws.shared.GenericMessage;
 import com.hoaxify.ws.shared.Messages;
 import com.hoaxify.ws.user.dto.UserCreate;
-import com.hoaxify.ws.user.dto.userDto;
+import com.hoaxify.ws.user.dto.UserDto;
 import com.hoaxify.ws.user.exception.ActivationNotificationException;
 import com.hoaxify.ws.user.exception.InvalidTokenException;
+import com.hoaxify.ws.user.exception.NotFoundException;
 import com.hoaxify.ws.user.exception.NotUniqEmailException;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -49,8 +54,13 @@ public class UserController {
 
     //birden fazla kullancıı oldugğu için listelmek için bir and point eklendi bunun içinde http methodu ise get methodu
     @GetMapping("/api/v1/users")
-    Page<userDto> getUsers(Pageable page) {//bu controllerden elimizle kaç tane veri girmek yerine bu request  bzie belirli bir miktar sayi girmemizi sağlar
-        return userService.getUsers(page).map(userDto::new);
+    Page<UserDto> getUsers(Pageable page) {//bu controllerden elimizle kaç tane veri girmek yerine bu request  bzie belirli bir miktar sayi girmemizi sağlar
+        return userService.getUsers(page).map(UserDto::new);
+    }
+
+    @GetMapping("api/v1/users/{id}")
+    UserDto getUserById(@PathVariable Long id) {
+        return new UserDto(userService.getUser(id));
     }
 
 
@@ -86,12 +96,21 @@ public class UserController {
     }
 
     @ExceptionHandler(InvalidTokenException.class)
-    ResponseEntity<ApiError> handleInvalidTokenException(InvalidTokenException exception) {
+    ResponseEntity<ApiError> handleInvalidTokenException(InvalidTokenException exception, HttpServletRequest request) {
         ApiError apiError = new ApiError();
-        apiError.setPath("/api/v1/users");
+        apiError.setPath(request.getRequestURI());
         apiError.setMessage(exception.getMessage());
         apiError.setStatus(400);
         return ResponseEntity.status(400).body(apiError);
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    ResponseEntity<ApiError> handleEntityNotFoundException(NotFoundException exception, HttpServletRequest request) {
+        ApiError apiError = new ApiError();
+        apiError.setPath(request.getRequestURI());
+        apiError.setMessage(exception.getMessage());
+        apiError.setStatus(404);
+        return ResponseEntity.status(404).body(apiError);
     }
 
 

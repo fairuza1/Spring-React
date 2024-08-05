@@ -1,11 +1,8 @@
 package com.hoaxify.ws.user.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hoaxify.ws.user.User;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
 
-public class userDto {
+public class UserDto {
 
     long id;
 
@@ -16,7 +13,7 @@ public class userDto {
 
     String image;
 
-    public userDto(User user) {
+    public UserDto(User user) {
         setId(user.getId());
         setUsername(user.getUsername());
         setEmail(user.getEmail());

@@ -5,6 +5,7 @@ import com.hoaxify.ws.error.ApiError;
 import com.hoaxify.ws.shared.GenericMessage;
 import com.hoaxify.ws.shared.Messages;
 import com.hoaxify.ws.user.dto.UserCreate;
+import com.hoaxify.ws.user.dto.userDto;
 import com.hoaxify.ws.user.exception.ActivationNotificationException;
 import com.hoaxify.ws.user.exception.InvalidTokenException;
 import com.hoaxify.ws.user.exception.NotUniqEmailException;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -49,8 +49,8 @@ public class UserController {
 
     //birden fazla kullancıı oldugğu için listelmek için bir and point eklendi bunun içinde http methodu ise get methodu
     @GetMapping("/api/v1/users")
-    Page<User> getUsers(Pageable pageable) {//bu controllerden elimizle kaç tane veri girmek yerine bu request  bzie belirli bir miktar sayi girmemizi sağlar
-        return userService.getUsers(pageable);
+    Page<userDto> getUsers(Pageable page) {//bu controllerden elimizle kaç tane veri girmek yerine bu request  bzie belirli bir miktar sayi girmemizi sağlar
+        return userService.getUsers(page).map(userDto::new);
     }
 
 

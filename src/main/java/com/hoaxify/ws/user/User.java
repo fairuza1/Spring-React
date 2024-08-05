@@ -15,7 +15,7 @@ public class User {
 
 
     String username;
-@JsonIgnore//görünmesini istemediklerimize bunu koyarız
+    @JsonIgnore//görünmesini istemediklerimize bunu koyarız
     String password;
 
     String email;
@@ -25,6 +25,9 @@ public class User {
     String activationToken;
 
     String image;
+
+
+
 
     public String getImage() {
         return image;

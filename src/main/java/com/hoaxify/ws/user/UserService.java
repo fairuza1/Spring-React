@@ -68,4 +68,8 @@ public class UserService {
     public User getUser(long id) {
         return  userRepository.findById(id).orElseThrow(()-> new NotFoundException(id));// bu method geriye varsa user objesi döndürecek yoksa bu exceptionu atacak bu da kendi içinde id kullanarak mesajı translate etmiş olacak ve en sonundada not foun user conttroller ile
     }
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
 }

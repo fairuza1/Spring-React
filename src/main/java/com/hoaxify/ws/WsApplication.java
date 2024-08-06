@@ -29,7 +29,7 @@ public class WsApplication {
                     User user = new User();
                     user.setUsername("user"+i);
                     user.setEmail("user"+i+"@mail.com");
-                    user.setPassword(passwordEncoder.encode("P1ssword"+i));
+                    user.setPassword(passwordEncoder.encode("P1ssword"));
                     user.setActive(true);
                     userRepository.save(user);//burada database eklenme yapıldı
 
